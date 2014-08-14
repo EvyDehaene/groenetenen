@@ -1,9 +1,18 @@
 package be.vdab.valueobjects;
 
+import javax.validation.constraints.NotNull;
+
+import org.hibernate.validator.constraints.NotBlank;
+
 public class Adres {
+	@NotBlank
 	private String straat;
+	@NotBlank
 	private String huisNr;
+	@NotNull
+	@NotBlank
 	private Integer postcode;
+	@NotBlank
 	private String gemeente;
 	public Adres(String straat, String huisNr, Integer postcode, String gemeente){
 		this.straat=straat;

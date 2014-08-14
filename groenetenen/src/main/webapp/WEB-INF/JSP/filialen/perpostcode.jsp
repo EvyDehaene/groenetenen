@@ -14,10 +14,11 @@
 		<c:url value="/filialen" var="url"/>
 		<form:form action="${url}" commandName="postcodeReeks" method="get">
 			<form:label path="vanpostcode">Van:<form:errors path="vanpostcode"/></form:label>
-			<form:input path="vanpostcode" autofocus="true"/>
-			<form:label path="totpostcode">Tot:<form:errors path="totpostcode"/></form:label>
-			<form:input path="totpostcode"/>
+			<form:input path="vanpostcode" autofocus="true" type="number" required="true" min="1000" max="9999"/>
+			<form:label path="totpostcode">Tot:<form:errors path="totpostcode"/><form:errors path="totIsGroterOfGelijkAanVan"/></form:label>
+			<form:input path="totpostcode" type="number" required="true" min="1000" max="9999"/>
 			<input type="submit" value="Zoeken">
+			<form:errors element="div" cssClass="fout"/>
 		</form:form>
 		<c:forEach items="${filialen}" var="filiaal">
 			<spring:url var="url" value="/filialen/{id}">

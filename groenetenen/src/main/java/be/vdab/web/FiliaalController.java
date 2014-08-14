@@ -2,12 +2,11 @@ package be.vdab.web;
 
 import java.util.logging.Logger;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.DataBinder;
-import org.springframework.web.bind.annotation.InitBinder;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -30,18 +29,19 @@ public class FiliaalController {
 				  filiaalService.findAantalFilialen());
 		}
 	@RequestMapping(value="toevoegen", method=RequestMethod.GET)
-	String createForm(){
-		return TOEVOEGEN_VIEW;
+	ModelAndView createForm(){
+		return new ModelAndView (TOEVOEGEN_VIEW, "filiaal", new Filiaal());
 	}
 	private static final String REDIRECT_URL_NA_TOEVOEGEN = "redirect:/filialen";
-	private final static Logger logger = Logger.getLogger(OfferteController.class.getName());
 	//importeer Logger uit de package java.util.logging
-	@RequestMapping(method=RequestMethod.POST)
-	String create() {
-		//later voeg je een record toe aan de database
-		logger.info("filiaal record toevoegen aan database");
-		return REDIRECT_URL_NA_TOEVOEGEN;
-	}
+	@RequestMapping(method = RequestMethod.POST)
+	public String create(@Valid Filiaal filiaal, BindingResult bindingResult) {
+	  if (bindingResult.hasErrors()) {
+	    return TOEVOEGEN_VIEW;
+	  }
+	  filiaalService.create(filiaal);
+	  return REDIRECT_URL_NA_TOEVOEGEN;
+	} 
 	private final FiliaalService filiaalService;
 	@Autowired
 	FiliaalController(FiliaalService filiaalService){
@@ -83,15 +83,36 @@ public class FiliaalController {
 		return new ModelAndView(PER_POSTCODE_VIEW, "postcodeReeks", reeks);
 	}
 	@RequestMapping(method=RequestMethod.GET, params={"vanpostcode", "totpostcode"})
-	ModelAndView findByPostcodeReeks(@ModelAttribute PostcodeReeks reeks, BindingResult bindingResult){
+	ModelAndView findByPostcodeReeks(@Valid PostcodeReeks reeks, BindingResult bindingResult){
 		ModelAndView modelAndView = new ModelAndView(PER_POSTCODE_VIEW);
 		if (! bindingResult.hasErrors()){
-			modelAndView.addObject("filialen",  filiaalService.findByPostcodeReeks(reeks));
+			Iterable<Filiaal> filialen = filiaalService.findByPostcodeReeks(reeks);
+			if (filialen.iterator().hasNext()){
+				modelAndView.addObject("filialen",  filialen);
+			}
+			else
+			{
+				bindingResult.reject("geenFilialen");
+			}
 		}
 		return modelAndView;
 	}
-	@InitBinder("postcodeReeks")
-	void initBinderPostcodeReeks(DataBinder dataBinder){
-		dataBinder.setRequiredFields("vanpostcode", "totpostcode");
+	private static final String WIJZIGEN_VIEW = "filialen/wijzigen";
+	@RequestMapping(value ="{id}/wijzigen", method = RequestMethod.GET)
+	ModelAndView updateForm(@PathVariable long id) {
+	  Filiaal filiaal = filiaalService.read(id);
+	  if (filiaal == null) {
+	    return new ModelAndView(REDIRECT_URL_FILIAAL_NIET_GEVONDEN);
+	  }
+	  return new ModelAndView(WIJZIGEN_VIEW, "filiaal", filiaal);
 	}
+	private static final String REDIRECT_URL_NA_WIJZIGEN = "redirect:/filialen";
+	@RequestMapping(value = "{id}", method = RequestMethod.POST)
+	String update(@Valid Filiaal filiaal, BindingResult bindingResult) {
+	  if (bindingResult.hasErrors()) {
+	    return WIJZIGEN_VIEW;
+	  }
+	  filiaalService.update(filiaal);
+	  return REDIRECT_URL_NA_WIJZIGEN;
+	} 
 }
