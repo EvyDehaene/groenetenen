@@ -1,0 +1,2 @@
+update gebruikers set paswoord='$2a$10$3DPuiwzO.I2UYggelBe8NuCHdd7Jblz2cu8K0ZkkguQZYnCIA4u5O' where naam='joe';
+update gebruikers set paswoord='$2a$10$HI7LCswjUQmLWvKRyJfVA.P9ZQ3nNKi4GWfW6MKJwTCbeK9MWU.Oi' where naam='averell'
