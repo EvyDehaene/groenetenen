@@ -11,6 +11,5 @@ public interface FiliaalDAO {
 	Iterable<Filiaal> findAll();
 	long findAantalFilialen();
 	//het aantal werknemers van een filiaal
-	long findAantalWerknemers(long id);
 	Iterable<Filiaal> findByPostcodeReeks(PostcodeReeks reeks);
 }
