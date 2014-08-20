@@ -14,6 +14,7 @@ public class Adres {
 	private Integer postcode;
 	@NotBlank
 	private String gemeente;
+	public Adres(){}
 	public Adres(String straat, String huisNr, Integer postcode, String gemeente){
 		this.straat=straat;
 		this.huisNr=huisNr;
